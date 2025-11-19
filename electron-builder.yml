@@ -1,0 +1,21 @@
+appId: com.ethvalidator.monitor
+productName: ETH Validator Monitor
+directories:
+  output: dist
+  buildResources: assets
+files:
+  - src/**/*
+  - package.json
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+    - target: zip
+      arch:
+        - x64
+publish:
+  provider: generic
+  url: http://localhost:3000/updates
+
+

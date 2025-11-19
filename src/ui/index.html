@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETH Validator Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M16 2L4 9.5L16 16L28 9.5L16 2Z" fill="#627EEA"/>
+                        <path d="M4 9.5L16 16V30L4 9.5Z" fill="#627EEA" opacity="0.6"/>
+                        <path d="M28 9.5L16 16V30L28 9.5Z" fill="#627EEA" opacity="0.8"/>
+                    </svg>
+                    <div class="app-title">
+                        <h1>ETH Validator Monitor</h1>
+                        <a href="https://ethvalidatormonitor.com" target="_blank" class="app-url">ethvalidatormonitor.com</a>
+                    </div>
+                </div>
+                <span class="version-badge" id="versionBadge">v1.0.0</span>
+                <span class="last-refresh" id="lastRefreshTime">Last updated: -</span>
+            </div>
+            <div class="header-right">
+                <button class="btn-secondary" id="settingsBtn">Settings</button>
+                <button class="btn-primary" id="addValidatorBtn">Add Validator</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Validators</h3>
+                    <div id="validatorList" class="validator-list">
+                        <div class="empty-state">
+                            <p>No validators added yet</p>
+                            <p class="text-muted">Click "Add Validator" to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Dashboard -->
+            <main class="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <p class="stat-label">Total Balance</p>
+                        <p class="stat-value" id="totalBalance">0 ETH</p>
+                        <div class="stat-trend neutral" id="balanceTrend">No change</div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Active Validators</p>
+                        <p class="stat-value" id="activeValidators">0</p>
+                        <div class="stat-trend neutral" id="activeValidatorsTrend">0 offline</div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Avg Effectiveness</p>
+                        <p class="stat-value" id="avgEffectiveness">0%</p>
+                        <div class="stat-trend neutral" id="effectivenessTrend">No data</div>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-label">Avg Uptime</p>
+                        <p class="stat-value" id="avgUptime">0%</p>
+                        <div class="stat-trend neutral" id="uptimeTrend">Range: 0-0%</div>
+                    </div>
+                </div>
+
+                <div class="chart-container performance-overview">
+                    <h3>Performance Overview</h3>
+                    <div class="perf-grid">
+                        <div class="perf-card">
+                            <p class="perf-label">Average Effectiveness</p>
+                            <p class="perf-value" id="perfAvgEffectivenessValue">0%</p>
+                            <div class="perf-bar">
+                                <div class="perf-bar-fill" id="perfAvgEffectivenessBar"></div>
+                            </div>
+                        </div>
+                        <div class="perf-card">
+                            <p class="perf-label">Average Uptime</p>
+                            <p class="perf-value" id="perfAvgUptimeValue">0%</p>
+                            <div class="perf-bar">
+                                <div class="perf-bar-fill" id="perfAvgUptimeBar"></div>
+                            </div>
+                        </div>
+                        <div class="perf-card">
+                            <p class="perf-label">Best Validator</p>
+                            <p class="perf-value" id="perfBestValidatorValue">-</p>
+                            <p class="perf-sub" id="perfBestValidatorName">No data yet</p>
+                        </div>
+                        <div class="perf-card">
+                            <p class="perf-label">Total Validators</p>
+                            <p class="perf-value" id="perfValidatorCount">0</p>
+                            <p class="perf-sub" id="perfActiveSummary">0 active</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="validator-details" id="validatorDetails">
+                    <h3>Validator Details</h3>
+                    <p class="text-muted">Select a validator to view details</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- Add Validator Modal -->
+        <div class="modal" id="addValidatorModal" style="display: none;">
+            <div class="modal-content">
+                <h2>Add Validator</h2>
+                <form id="addValidatorForm">
+                    <div class="form-group">
+                        <label for="validatorIndex">Validator Index or Public Key</label>
+                        <input type="text" id="validatorIndex" placeholder="e.g., 123456 or 0x..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="validatorName">Name (Optional)</label>
+                        <input type="text" id="validatorName" placeholder="My Validator">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelAddBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Validator</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Validator Modal -->
+        <div class="modal" id="editValidatorModal" style="display: none;">
+            <div class="modal-content">
+                <h2>Edit Validator</h2>
+                <form id="editValidatorForm">
+                    <input type="hidden" id="editValidatorId">
+                    <div class="form-group">
+                        <label for="editValidatorName">Name</label>
+                        <input type="text" id="editValidatorName" placeholder="Validator name" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelEditBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Settings Page (hidden by default) -->
+        <div class="settings-page" id="settingsPage" style="display: none;">
+            <div class="settings-header">
+                <button class="btn-back" id="backToDashboard">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 18L2 10L10 2L11.4 3.4L5.8 9H18V11H5.8L11.4 16.6L10 18Z"/>
+                    </svg>
+                    Back to Dashboard
+                </button>
+                <h2>Settings</h2>
+            </div>
+
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h3>Desktop Notifications</h3>
+                    <p class="settings-description">Get alerted when your validators need attention</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-row">
+                            <label class="setting-label">
+                                <input type="checkbox" id="notifyHealthDrop" checked>
+                                <span>Health score drops below threshold</span>
+                            </label>
+                            <div class="setting-input">
+                                <label>Threshold:</label>
+                                <input type="number" id="healthThreshold" value="85" min="0" max="100" class="input-small">
+                            </div>
+                        </div>
+                        <p class="setting-hint">Alert when validator health falls below this score</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="notifyOffline" checked>
+                            <span>Validator goes offline</span>
+                        </label>
+                        <p class="setting-hint">Notify when 3+ consecutive attestations are missed</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="notifyProposal" checked>
+                            <span>Block proposal assigned</span>
+                        </label>
+                        <p class="setting-hint">Get notified when you're selected to propose a block</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-row">
+                            <label class="setting-label">
+                                <input type="checkbox" id="notifyMissRate" checked>
+                                <span>High miss rate detected</span>
+                            </label>
+                            <div class="setting-input">
+                                <label>Threshold:</label>
+                                <input type="number" id="missRateThreshold" value="2" min="0" max="100" step="0.1" class="input-small">
+                                <span>%</span>
+                            </div>
+                        </div>
+                        <p class="setting-hint">Alert when attestation miss rate exceeds threshold</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="notifyBalanceDrop">
+                            <span>Balance drops (possible slashing)</span>
+                        </label>
+                        <p class="setting-hint">Immediate alert if validator balance decreases</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Auto-Refresh</h3>
+                    <p class="settings-description">How often to check for validator updates</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-row">
+                            <label class="setting-label">Refresh interval:</label>
+                            <select id="refreshInterval" class="input-select">
+                                <option value="60000">1 minute</option>
+                                <option value="300000" selected>5 minutes</option>
+                                <option value="600000">10 minutes</option>
+                                <option value="1800000">30 minutes</option>
+                                <option value="3600000">1 hour</option>
+                            </select>
+                        </div>
+                        <p class="setting-hint">More frequent updates may increase API usage</p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Display Preferences</h3>
+                    <p class="settings-description">Customize how information is displayed</p>
+                    
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="showDetailedStats" checked>
+                            <span>Show detailed statistics</span>
+                        </label>
+                        <p class="setting-hint">Display additional metrics in the dashboard</p>
+                    </div>
+
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="compactMode">
+                            <span>Compact mode</span>
+                        </label>
+                        <p class="setting-hint">Use smaller cards to fit more on screen</p>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button type="button" class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+                    <button type="button" class="btn-secondary" id="resetSettingsBtn">Reset to Defaults</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
