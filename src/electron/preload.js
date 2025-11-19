@@ -6,6 +6,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Version API
   getCurrentVersion: () => ipcRenderer.invoke('get-current-version'),
   
+  // API Key Management
+  getApiKey: () => ipcRenderer.invoke('get-api-key'),
+  setApiKey: (apiKey) => ipcRenderer.invoke('set-api-key', apiKey),
+  
   // Validator Management APIs
   saveValidators: (validators) => ipcRenderer.invoke('save-validators', validators),
   getValidators: () => ipcRenderer.invoke('get-validators'),

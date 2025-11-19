@@ -2,6 +2,10 @@ const { app, BrowserWindow, ipcMain, dialog, Tray, Menu, nativeImage } = require
 const path = require('path');
 const axios = require('axios');
 const fs = require('fs');
+const Store = require('electron-store');
+
+// Initialize electron-store for persistent settings
+const store = new Store();
 
 // Development mode detection
 const isDevelopment = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
@@ -24,8 +28,11 @@ const devError = (...args) => {
 
 // Beaconcha.in API configuration
 const BEACONCHAIN_API_BASE = 'https://beaconcha.in/api/v1';
-// Get API key from environment variable or use empty string (free tier)
-const BEACONCHAIN_API_KEY = process.env.BEACONCHAIN_API_KEY || '';
+
+// Get API key from storage, env variable, or use empty string (free tier)
+function getApiKey() {
+  return store.get('beaconchaApiKey') || process.env.BEACONCHAIN_API_KEY || '';
+}
 
 // Storage helper functions
 function getStoragePath() {
@@ -206,6 +213,16 @@ ipcMain.handle('get-current-version', () => {
   return currentVersion;
 });
 
+// API Key Management
+ipcMain.handle('get-api-key', () => {
+  return getApiKey();
+});
+
+ipcMain.handle('set-api-key', (event, apiKey) => {
+  store.set('beaconchaApiKey', apiKey);
+  return true;
+});
+
 // Validator Node Management
 ipcMain.handle('save-validators', async (event, validators) => {
   try {
@@ -247,10 +264,11 @@ ipcMain.handle('fetch-validator-stats', async (event, validatorId) => {
     // Build request
     const url = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(id)}`;
     const headers = {};
-    if (BEACONCHAIN_API_KEY) {
+    const apiKey = getApiKey();
+    if (apiKey) {
       // As per docs: header name is `apikey`
       // https://docs.beaconcha.in/api/overview
-      headers.apikey = BEACONCHAIN_API_KEY;
+      headers.apikey = apiKey;
     }
 
     const response = await axios.get(url, { headers });
@@ -344,8 +362,9 @@ ipcMain.handle('fetch-validator-income', async (event, validatorIndex) => {
     
     // Try multiple approaches since Beaconcha.in API might vary
     const headers = {};
-    if (BEACONCHAIN_API_KEY) {
-      headers.apikey = BEACONCHAIN_API_KEY;
+    const apiKey = getApiKey();
+    if (apiKey) {
+      headers.apikey = apiKey;
     }
 
     devLog(`Fetching income for validator ${index}`);
@@ -439,8 +458,9 @@ ipcMain.handle('fetch-validator-attestations', async (event, validatorIndex) => 
     const index = String(validatorIndex).trim();
     
     const headers = {};
-    if (BEACONCHAIN_API_KEY) {
-      headers.apikey = BEACONCHAIN_API_KEY;
+    const apiKey = getApiKey();
+    if (apiKey) {
+      headers.apikey = apiKey;
     }
 
     devLog(`Fetching attestation history for validator ${index}`);
@@ -555,8 +575,9 @@ ipcMain.handle('fetch-validator-proposals', async (event, validatorIndex) => {
     const index = String(validatorIndex).trim();
     
     const headers = {};
-    if (BEACONCHAIN_API_KEY) {
-      headers.apikey = BEACONCHAIN_API_KEY;
+    const apiKey = getApiKey();
+    if (apiKey) {
+      headers.apikey = apiKey;
     }
 
     devLog(`Fetching proposal history for validator ${index}`);

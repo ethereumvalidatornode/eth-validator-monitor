@@ -19,7 +19,8 @@ let appSettings = {
         detailedStats: true,
         compactMode: false
     },
-    refreshInterval: 300000
+    refreshInterval: 300000,
+    apiKey: ''
 };
 
 // Initialize app
@@ -963,7 +964,13 @@ function hideModal(modalId) {
 }
 
 // Settings Page Functions
-function showSettingsPage() {
+async function showSettingsPage() {
+    // Load API key from main process
+    const apiKey = await window.electronAPI.getApiKey();
+    if (apiKey) {
+        appSettings.apiKey = apiKey;
+    }
+    
     // Load current settings into UI
     document.getElementById('notifyHealthDrop').checked = appSettings.notifications.healthDrop;
     document.getElementById('healthThreshold').value = appSettings.notifications.healthThreshold;
@@ -975,6 +982,7 @@ function showSettingsPage() {
     document.getElementById('refreshInterval').value = appSettings.refreshInterval;
     document.getElementById('showDetailedStats').checked = appSettings.display.detailedStats;
     document.getElementById('compactMode').checked = appSettings.display.compactMode;
+    document.getElementById('beaconchaApiKey').value = appSettings.apiKey;
     
     // Show settings page
     document.getElementById('settingsPage').style.display = 'block';
@@ -984,7 +992,7 @@ function hideSettingsPage() {
     document.getElementById('settingsPage').style.display = 'none';
 }
 
-function saveSettings() {
+async function saveSettings() {
     // Read values from UI
     appSettings.notifications.healthDrop = document.getElementById('notifyHealthDrop').checked;
     appSettings.notifications.healthThreshold = parseInt(document.getElementById('healthThreshold').value);
@@ -996,6 +1004,10 @@ function saveSettings() {
     appSettings.refreshInterval = parseInt(document.getElementById('refreshInterval').value);
     appSettings.display.detailedStats = document.getElementById('showDetailedStats').checked;
     appSettings.display.compactMode = document.getElementById('compactMode').checked;
+    appSettings.apiKey = document.getElementById('beaconchaApiKey').value.trim();
+    
+    // Save API key to main process
+    await window.electronAPI.setApiKey(appSettings.apiKey);
     
     // Update refresh interval
     REFRESH_INTERVAL = appSettings.refreshInterval;
@@ -1014,7 +1026,7 @@ function saveSettings() {
     hideSettingsPage();
 }
 
-function resetSettings() {
+async function resetSettings() {
     if (!confirm('Reset all settings to defaults?')) return;
     
     // Reset to defaults
@@ -1032,8 +1044,12 @@ function resetSettings() {
             detailedStats: true,
             compactMode: false
         },
-        refreshInterval: 300000
+        refreshInterval: 300000,
+        apiKey: ''
     };
+    
+    // Clear API key from main process
+    await window.electronAPI.setApiKey('');
     
     // Update UI
     showSettingsPage();
