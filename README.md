@@ -34,7 +34,7 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 
 ### Download Pre-built Binary
 
-1. Go to [Releases](https://github.com/yourusername/eth-validator-monitor/releases)
+1. Go to [Releases](https://github.com/ethereumvalidatornode/eth-validator-monitor/releases)
 2. Download the latest version for your platform:
    - Windows: `ETH-Validator-Monitor-Setup-X.X.X.exe`
    - macOS: `ETH-Validator-Monitor-X.X.X.dmg`
@@ -52,7 +52,7 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/eth-validator-monitor.git
+git clone https://github.com/ethereumvalidatornode/eth-validator-monitor.git
 cd eth-validator-monitor
 
 # Install dependencies
@@ -147,8 +147,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you find this tool useful, consider:
 - ⭐ Starring the repository
-- 🐛 Reporting bugs or requesting features via [Issues](https://github.com/yourusername/eth-validator-monitor/issues)
-- 💬 Joining the discussion in [Discussions](https://github.com/yourusername/eth-validator-monitor/discussions)
+- 🐛 Reporting bugs or requesting features via [Issues](https://github.com/ethereumvalidatornode/eth-validator-monitor/issues)
+- 💬 Joining the discussion in [Discussions](https://github.com/ethereumvalidatornode/eth-validator-monitor/discussions)
 
 ## Disclaimer
 
