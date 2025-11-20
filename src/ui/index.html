@@ -242,11 +242,21 @@
                     <p class="settings-description">Configure Beaconcha.in API access</p>
                     
                     <div class="setting-item">
-                        <div class="setting-row">
-                            <label class="setting-label">Beaconcha.in API Key (Optional):</label>
-                            <input type="text" id="beaconchaApiKey" placeholder="Enter your API key" class="input-text" style="flex: 1; max-width: 400px;">
-                        </div>
-                        <p class="setting-hint">Get a free API key at <a href="https://beaconcha.in/user/settings#api" target="_blank" style="color: var(--primary-color);">beaconcha.in</a> for higher rate limits. Without a key, you'll use the free tier.</p>
+                        <label class="setting-label" for="beaconchaApiKey">
+                            Beaconcha.in API Key (optional)
+                        </label>
+                        <input
+                            type="text"
+                            id="beaconchaApiKey"
+                            class="input-text"
+                            placeholder="Enter your API key"
+                            autocomplete="off"
+                        >
+                        <p class="setting-hint">
+                            Get a free API key at
+                            <a href="https://beaconcha.in/user/settings#api" target="_blank">beaconcha.in</a>.
+                            Without a key, the app uses the free tier with lower rate limits.
+                        </p>
                     </div>
                 </div>
 

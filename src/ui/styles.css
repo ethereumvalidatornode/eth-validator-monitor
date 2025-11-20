@@ -183,8 +183,20 @@ body {
     min-width: 150px;
 }
 
+.input-text {
+    width: 100%;
+    max-width: 420px;
+    padding: 8px 12px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
 .input-small:focus,
-.input-select:focus {
+.input-select:focus,
+.input-text:focus {
     outline: none;
     border-color: var(--primary-color);
 }
