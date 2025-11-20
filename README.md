@@ -39,40 +39,12 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 
 ## Installation
 
-### Download Pre-built Binary
-
 1. Go to [Releases](https://github.com/ethereumvalidatornode/eth-validator-monitor/releases)
 2. Download the latest version for your platform:
    - Windows: `ETH-Validator-Monitor-Setup-X.X.X.exe`
    - macOS: `ETH-Validator-Monitor-X.X.X.dmg`
    - Linux: `ETH-Validator-Monitor-X.X.X.AppImage`
 3. Install and run
-
-### Build from Source
-
-#### Prerequisites
-
-- Node.js 18+ and npm
-- Git
-
-#### Steps
-
-```bash
-# Clone the repository
-git clone https://github.com/ethereumvalidatornode/eth-validator-monitor.git
-cd eth-validator-monitor
-
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Build for production
-npm run build          # Windows
-npm run build:mac      # macOS
-npm run build:all      # All platforms
-```
 
 ## Configuration
 
