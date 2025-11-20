@@ -28,7 +28,14 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 
 ## Screenshots
 
-<!-- Add screenshots here -->
+![Dashboard Overview](screenshot-1.png)
+*Monitor multiple validators with real-time stats and health scores*
+
+![Validator Details](screenshot-2.png)
+*Detailed validator information including income, attestations, and proposals*
+
+![Settings Page](screenshot-3.png)
+*Configure API key, notifications, and display preferences*
 
 ## Installation
 
