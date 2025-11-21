@@ -17,7 +17,8 @@ let appSettings = {
     },
     display: {
         detailedStats: true,
-        compactMode: false
+        compactMode: false,
+        theme: 'dark'
     },
     refreshInterval: 300000,
     apiKey: ''
@@ -35,6 +36,7 @@ async function initializeApp() {
     try {
         // Load settings first
         loadSettings();
+        applyTheme(appSettings.display.theme || 'dark');
         
         // Get current version
         currentVersion = await window.electronAPI.getCurrentVersion();
@@ -198,6 +200,11 @@ function setupEventListeners() {
     document.getElementById('resetSettingsBtn').addEventListener('click', () => {
         resetSettings();
     });
+
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', toggleThemePreference);
+    }
 }
 
 // Setup menu keyboard shortcuts
@@ -954,6 +961,59 @@ function renderPerformanceOverview() {
     activeSummaryEl.textContent = `${activeCount} active`;
 }
 
+// Theme handling
+function toggleThemePreference() {
+    ensureDisplaySettings();
+    const newTheme = appSettings.display.theme === 'light' ? 'dark' : 'light';
+    applyTheme(newTheme);
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+}
+
+function applyTheme(preferredTheme) {
+    ensureDisplaySettings();
+    const theme = preferredTheme === 'light' ? 'light' : 'dark';
+    const root = document.documentElement;
+    if (root) {
+        root.setAttribute('data-theme', theme);
+    }
+    
+    appSettings.display.theme = theme;
+    
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+        toggleBtn.title = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+    }
+    
+    const toggleLabel = document.getElementById('themeToggleLabel');
+    if (toggleLabel) {
+        toggleLabel.textContent = theme === 'light' ? 'Light' : 'Dark';
+    }
+}
+
+function ensureDisplaySettings() {
+    if (!appSettings.display) {
+        appSettings.display = {
+            detailedStats: true,
+            compactMode: false,
+            theme: 'dark'
+        };
+        return;
+    }
+    
+    if (typeof appSettings.display.detailedStats === 'undefined') {
+        appSettings.display.detailedStats = true;
+    }
+    
+    if (typeof appSettings.display.compactMode === 'undefined') {
+        appSettings.display.compactMode = false;
+    }
+    
+    if (!appSettings.display.theme) {
+        appSettings.display.theme = 'dark';
+    }
+}
+
 // Modal utilities
 function showModal(modalId) {
     document.getElementById(modalId).style.display = 'flex';
@@ -1042,7 +1102,8 @@ async function resetSettings() {
         },
         display: {
             detailedStats: true,
-            compactMode: false
+            compactMode: false,
+            theme: 'dark'
         },
         refreshInterval: 300000,
         apiKey: ''
@@ -1058,6 +1119,8 @@ async function resetSettings() {
     localStorage.setItem('appSettings', JSON.stringify(appSettings));
     
     console.log('Settings reset to defaults');
+    
+    applyTheme('dark');
 }
 
 // Load settings from localStorage on app start
@@ -1066,11 +1129,14 @@ function loadSettings() {
     if (saved) {
         try {
             appSettings = JSON.parse(saved);
+            ensureDisplaySettings();
             REFRESH_INTERVAL = appSettings.refreshInterval;
             console.log('Settings loaded:', appSettings);
         } catch (e) {
             console.error('Error loading settings:', e);
         }
     }
+    
+    ensureDisplaySettings();
 }
 

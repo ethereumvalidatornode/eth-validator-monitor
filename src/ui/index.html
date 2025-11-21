@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,6 +26,17 @@
                 <span class="last-refresh" id="lastRefreshTime">Last updated: -</span>
             </div>
             <div class="header-right">
+                <button
+                    class="theme-toggle"
+                    id="themeToggleBtn"
+                    aria-pressed="false"
+                    title="Switch to light mode"
+                >
+                    <span class="theme-toggle-track" aria-hidden="true">
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                    <span class="theme-toggle-label" id="themeToggleLabel">Dark</span>
+                </button>
                 <button class="btn-secondary" id="settingsBtn">Settings</button>
                 <button class="btn-primary" id="addValidatorBtn">Add Validator</button>
             </div>
