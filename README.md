@@ -10,6 +10,7 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 - Monitor multiple validators from a single dashboard
 - Live balance, effectiveness, and uptime tracking
 - Block proposal and attestation history
+- Search and filter validators by name, index, or status
 
 📊 **Performance Analytics**
 - Health score calculation for each validator
@@ -17,7 +18,7 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 - Miss rate analysis and alerts
 
 🎨 **Beautiful UI**
-- Modern, dark-themed interface
+- Modern interface with light & dark mode support
 - Responsive design with smooth animations
 - System tray integration
 
@@ -33,6 +34,9 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 
 ![Validator Details](screenshot-2.png)
 *Detailed validator information including income, attestations, and proposals*
+
+![Light Mode](light-mode.png)
+*Beautiful light mode support - switch themes with one click*
 
 ![Settings Page](screenshot-3.png)
 *Configure API key, notifications, and display preferences*
