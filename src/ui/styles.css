@@ -449,6 +449,64 @@ button {
     margin-bottom: 16px;
 }
 
+.search-container {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 36px 10px 36px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: var(--background);
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.search-clear:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
 .validator-list {
     display: flex;
     flex-direction: column;

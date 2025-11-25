@@ -5,6 +5,7 @@ let autoRefreshInterval = null;
 let lastRefreshTime = null;
 let REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes (configurable)
 let previousDashboardStats = null; // Store previous stats for trend calculation
+let searchQuery = ''; // Current search query
 let appSettings = {
     notifications: {
         healthDrop: true,
@@ -205,6 +206,33 @@ function setupEventListeners() {
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', toggleThemePreference);
     }
+
+    // Search functionality
+    const searchInput = document.getElementById('validatorSearch');
+    const clearSearchBtn = document.getElementById('clearSearch');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderValidatorList();
+            
+            // Show/hide clear button
+            if (clearSearchBtn) {
+                clearSearchBtn.style.display = searchQuery ? 'flex' : 'none';
+            }
+        });
+    }
+    
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            searchQuery = '';
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            clearSearchBtn.style.display = 'none';
+            renderValidatorList();
+        });
+    }
 }
 
 // Setup menu keyboard shortcuts
@@ -340,8 +368,39 @@ function renderValidatorList() {
         return;
     }
 
+    // Filter validators based on search query
+    let filteredValidators = validators;
+    if (searchQuery) {
+        filteredValidators = validators.filter(validator => {
+            const name = (validator.name || '').toLowerCase();
+            const index = String(validator.index || '').toLowerCase();
+            const status = (validator.status || '').toLowerCase();
+            
+            // Get health status text
+            const healthScore = validator.healthScore || 0;
+            const healthStatus = getHealthStatus(healthScore).label.toLowerCase();
+            
+            // Check if any field matches the search query
+            return name.includes(searchQuery) || 
+                   index.includes(searchQuery) || 
+                   status.includes(searchQuery) ||
+                   healthStatus.includes(searchQuery);
+        });
+    }
+
+    // Show "no results" message if search returned nothing
+    if (filteredValidators.length === 0) {
+        listContainer.innerHTML = `
+            <div class="empty-state">
+                <p>No validators found</p>
+                <p class="text-muted">Try a different search term</p>
+            </div>
+        `;
+        return;
+    }
+
     let html = '';
-    validators.forEach(validator => {
+    filteredValidators.forEach(validator => {
         // Calculate health score if not present
         if (!validator.healthScore) {
             validator.healthScore = calculateHealthScore(validator);
