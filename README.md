@@ -27,6 +27,12 @@ A beautiful, standalone desktop application for monitoring your Ethereum validat
 - No telemetry or tracking
 - Standalone application - works offline
 
+🧪 **Testnet Support**
+- Monitor validators on Holesky testnet
+- Easy network switching between Mainnet and Testnet
+- Separate validator lists for each network
+- Visual indicators to prevent confusion
+
 ## Screenshots
 
 ![Dashboard Overview](screenshot-1.png)
@@ -63,12 +69,47 @@ The app uses the [Beaconcha.in](https://beaconcha.in) API to fetch validator dat
    ```
 3. Restart the app
 
+## Testnet Support
+
+### Monitoring Testnet Validators
+
+The app supports both **Ethereum Mainnet** and **Holesky Testnet**, allowing you to test your validator setup before going live on mainnet.
+
+**How to Switch Networks:**
+
+1. Click **Settings** button in the header
+2. In the **Network Configuration** section, select your network:
+   - 🟢 **Mainnet (Ethereum)** - Production network
+   - 🟡 **Holesky Testnet** - Test network for validators
+3. Click **Save Settings**
+4. The app will reload with validators for the selected network
+
+**Visual Indicators:**
+
+- **Network Badge** - Always visible in the header showing current network (🟢 Mainnet or 🟡 Holesky)
+- **Testnet Banner** - Yellow warning banner appears when monitoring testnet validators
+- **Separate Storage** - Each network maintains its own validator list, so you can switch without losing data
+
+**Important Notes:**
+
+- The app always starts on **Mainnet** by default for safety
+- Your API key works for both mainnet and testnet
+- Validators are stored separately per network (`validators_mainnet.json` and `validators_holesky.json`)
+- Holesky testnet uses [hoodi.beaconcha.in](https://hoodi.beaconcha.in) for data
+
+**Get Testnet ETH:**
+
+To run validators on Holesky testnet, you'll need testnet ETH:
+- [Holesky Faucet](https://faucet.quicknode.com/ethereum/holesky)
+- [Holesky POW Faucet](https://holesky-faucet.pk910.de/)
+
 ## Usage
 
 1. **Launch the app** - Open ETH Validator Monitor
-2. **Add a validator** - Click "Add Validator" and enter your validator index or public key
-3. **Monitor** - View real-time stats, health scores, and performance metrics
-4. **Settings** - Configure refresh intervals and notification preferences
+2. **Select network** - Choose Mainnet or Holesky in Settings (default: Mainnet)
+3. **Add a validator** - Click "Add Validator" and enter your validator index or public key
+4. **Monitor** - View real-time stats, health scores, and performance metrics
+5. **Settings** - Configure refresh intervals and notification preferences
 
 ## Project Structure
 
