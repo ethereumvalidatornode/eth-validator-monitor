@@ -27,6 +27,14 @@
             </div>
             <div class="header-right">
                 <button
+                    class="network-badge"
+                    id="networkBadge"
+                    title="Click to change network in Settings"
+                >
+                    <span class="network-icon">🟢</span>
+                    <span class="network-label" id="networkLabel">Mainnet</span>
+                </button>
+                <button
                     class="theme-toggle"
                     id="themeToggleBtn"
                     aria-pressed="false"
@@ -41,6 +49,16 @@
                 <button class="btn-primary" id="addValidatorBtn">Add Validator</button>
             </div>
         </header>
+
+        <!-- Testnet Warning Banner -->
+        <div class="testnet-banner" id="testnetBanner" style="display: none;">
+            <div class="testnet-banner-content">
+                <span class="testnet-banner-icon">⚠️</span>
+                <span class="testnet-banner-text">
+                    <strong>TESTNET MODE:</strong> You are monitoring <span id="testnetName">Holesky</span> testnet validators
+                </span>
+            </div>
+        </div>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -267,6 +285,24 @@
                 </div>
 
                 <div class="settings-section">
+                    <h3>Network Configuration</h3>
+                    <p class="settings-description">Select which Ethereum network to monitor</p>
+                    
+                    <div class="setting-item">
+                        <div class="setting-row">
+                            <label class="setting-label">Network:</label>
+                            <select id="networkSelector" class="input-select">
+                                <option value="mainnet">Mainnet (Ethereum)</option>
+                                <option value="holesky">Holesky Testnet</option>
+                            </select>
+                        </div>
+                        <p class="setting-hint">
+                            ⚠️ Switching networks will reload your validators. Each network maintains separate validator lists.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
                     <h3>API Configuration</h3>
                     <p class="settings-description">Configure Beaconcha.in API access</p>
                     
@@ -284,7 +320,7 @@
                         <p class="setting-hint">
                             Get a free API key at
                             <a href="https://beaconcha.in/user/settings#api" target="_blank">beaconcha.in</a>.
-                            Without a key, the app uses the free tier with lower rate limits.
+                            Your API key works for both mainnet and testnet. Without a key, the app uses the free tier with lower rate limits.
                         </p>
                     </div>
                 </div>

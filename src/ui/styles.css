@@ -327,6 +327,81 @@ body {
     gap: 12px;
 }
 
+.network-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--surface-elevated);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.network-badge:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.network-badge .network-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.network-badge .network-label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.network-badge.testnet {
+    border-color: #F59E0B;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.network-badge.testnet .network-icon {
+    color: #F59E0B;
+}
+
+.testnet-banner {
+    background: linear-gradient(90deg, #FEF3C7 0%, #FDE68A 100%);
+    border-bottom: 2px solid #F59E0B;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:root[data-theme='light'] .testnet-banner {
+    background: linear-gradient(90deg, #FEF3C7 0%, #FDE68A 100%);
+    border-bottom: 2px solid #F59E0B;
+}
+
+.testnet-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.testnet-banner-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.testnet-banner-text {
+    color: #78350F;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.testnet-banner-text strong {
+    font-weight: 700;
+    color: #78350F;
+}
+
 .theme-toggle {
     display: inline-flex;
     align-items: center;

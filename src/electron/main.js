@@ -27,7 +27,30 @@ const devError = (...args) => {
 };
 
 // Beaconcha.in API configuration
-const BEACONCHAIN_API_BASE = 'https://beaconcha.in/api/v1';
+const API_ENDPOINTS = {
+  mainnet: 'https://beaconcha.in/api/v1',
+  holesky: 'https://hoodi.beaconcha.in/api/v1'
+};
+
+// Get current network (default: mainnet)
+function getCurrentNetwork() {
+  return store.get('currentNetwork') || 'mainnet';
+}
+
+// Set current network
+function setCurrentNetwork(network) {
+  if (network === 'mainnet' || network === 'holesky') {
+    store.set('currentNetwork', network);
+    return true;
+  }
+  return false;
+}
+
+// Get API base URL for current network
+function getApiBaseUrl() {
+  const network = getCurrentNetwork();
+  return API_ENDPOINTS[network] || API_ENDPOINTS.mainnet;
+}
 
 // Get API key from storage, env variable, or use empty string (free tier)
 function getApiKey() {
@@ -36,7 +59,8 @@ function getApiKey() {
 
 // Storage helper functions
 function getStoragePath() {
-  return path.join(app.getPath('userData'), 'validators.json');
+  const network = getCurrentNetwork();
+  return path.join(app.getPath('userData'), `validators_${network}.json`);
 }
 
 function readStorage() {
@@ -223,6 +247,15 @@ ipcMain.handle('set-api-key', (event, apiKey) => {
   return true;
 });
 
+// Network Management
+ipcMain.handle('get-network', () => {
+  return getCurrentNetwork();
+});
+
+ipcMain.handle('set-network', (event, network) => {
+  return setCurrentNetwork(network);
+});
+
 // Validator Node Management
 ipcMain.handle('save-validators', async (event, validators) => {
   try {
@@ -262,7 +295,8 @@ ipcMain.handle('fetch-validator-stats', async (event, validatorId) => {
     const id = String(validatorId).trim();
 
     // Build request
-    const url = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(id)}`;
+    const apiBase = getApiBaseUrl();
+    const url = `${apiBase}/validator/${encodeURIComponent(id)}`;
     const headers = {};
     const apiKey = getApiKey();
     if (apiKey) {
@@ -361,6 +395,7 @@ ipcMain.handle('fetch-validator-income', async (event, validatorIndex) => {
     const index = String(validatorIndex).trim();
     
     // Try multiple approaches since Beaconcha.in API might vary
+    const apiBase = getApiBaseUrl();
     const headers = {};
     const apiKey = getApiKey();
     if (apiKey) {
@@ -371,7 +406,7 @@ ipcMain.handle('fetch-validator-income', async (event, validatorIndex) => {
     
     // Approach 1: Try the income endpoint (might be for premium users)
     try {
-      const incomeUrl = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}/income`;
+      const incomeUrl = `${apiBase}/validator/${encodeURIComponent(index)}/income`;
       const incomeResponse = await axios.get(incomeUrl, { headers });
       
       if (incomeResponse.data && incomeResponse.data.data) {
@@ -400,7 +435,7 @@ ipcMain.handle('fetch-validator-income', async (event, validatorIndex) => {
     }
     
     // Approach 2: Calculate income from current balance - 32 ETH (initial deposit)
-    const validatorUrl = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}`;
+    const validatorUrl = `${apiBase}/validator/${encodeURIComponent(index)}`;
     const validatorResponse = await axios.get(validatorUrl, { headers });
     
     const data = validatorResponse.data && validatorResponse.data.data
@@ -457,6 +492,7 @@ ipcMain.handle('fetch-validator-attestations', async (event, validatorIndex) => 
   try {
     const index = String(validatorIndex).trim();
     
+    const apiBase = getApiBaseUrl();
     const headers = {};
     const apiKey = getApiKey();
     if (apiKey) {
@@ -466,7 +502,7 @@ ipcMain.handle('fetch-validator-attestations', async (event, validatorIndex) => 
     devLog(`Fetching attestation history for validator ${index}`);
     
     // Get attestation performance data
-    const url = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}/attestations`;
+    const url = `${apiBase}/validator/${encodeURIComponent(index)}/attestations`;
     const response = await axios.get(url, { headers });
 
     const attestations = response.data && response.data.data
@@ -477,7 +513,7 @@ ipcMain.handle('fetch-validator-attestations', async (event, validatorIndex) => 
 
     if (attestations.length === 0) {
       // Fallback: get stats from main validator endpoint
-      const validatorUrl = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}`;
+      const validatorUrl = `${apiBase}/validator/${encodeURIComponent(index)}`;
       const validatorResponse = await axios.get(validatorUrl, { headers });
       const data = validatorResponse.data && validatorResponse.data.data
         ? Array.isArray(validatorResponse.data.data)
@@ -574,6 +610,7 @@ ipcMain.handle('fetch-validator-proposals', async (event, validatorIndex) => {
   try {
     const index = String(validatorIndex).trim();
     
+    const apiBase = getApiBaseUrl();
     const headers = {};
     const apiKey = getApiKey();
     if (apiKey) {
@@ -583,7 +620,7 @@ ipcMain.handle('fetch-validator-proposals', async (event, validatorIndex) => {
     devLog(`Fetching proposal history for validator ${index}`);
     
     // Get proposal data from Beaconcha.in
-    const url = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}/proposals`;
+    const url = `${apiBase}/validator/${encodeURIComponent(index)}/proposals`;
     devLog(`Proposals API URL: ${url}`);
     
     const response = await axios.get(url, { headers });
@@ -602,7 +639,7 @@ ipcMain.handle('fetch-validator-proposals', async (event, validatorIndex) => {
       devLog('No proposals found in /proposals endpoint, falling back to main validator endpoint...');
       
       // Fallback: get count from main validator endpoint
-      const validatorUrl = `${BEACONCHAIN_API_BASE}/validator/${encodeURIComponent(index)}`;
+      const validatorUrl = `${apiBase}/validator/${encodeURIComponent(index)}`;
       const validatorResponse = await axios.get(validatorUrl, { headers });
       const data = validatorResponse.data && validatorResponse.data.data
         ? Array.isArray(validatorResponse.data.data)

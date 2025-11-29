@@ -6,6 +6,7 @@ let lastRefreshTime = null;
 let REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes (configurable)
 let previousDashboardStats = null; // Store previous stats for trend calculation
 let searchQuery = ''; // Current search query
+let currentNetwork = 'mainnet'; // Current network (mainnet or holesky)
 let appSettings = {
     notifications: {
         healthDrop: true,
@@ -38,6 +39,10 @@ async function initializeApp() {
         // Load settings first
         loadSettings();
         applyTheme(appSettings.display.theme || 'dark');
+        
+        // Get current network
+        currentNetwork = await window.electronAPI.getNetwork();
+        updateNetworkBadge(currentNetwork);
         
         // Get current version
         currentVersion = await window.electronAPI.getCurrentVersion();
@@ -184,6 +189,11 @@ function setupEventListeners() {
 
     // Settings button
     document.getElementById('settingsBtn').addEventListener('click', () => {
+        showSettingsPage();
+    });
+
+    // Network badge click - open settings
+    document.getElementById('networkBadge').addEventListener('click', () => {
         showSettingsPage();
     });
 
@@ -1082,6 +1092,71 @@ function hideModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
+// Network Management Functions
+function updateNetworkBadge(network) {
+    const badge = document.getElementById('networkBadge');
+    const icon = badge.querySelector('.network-icon');
+    const label = document.getElementById('networkLabel');
+    const testnetBanner = document.getElementById('testnetBanner');
+    const testnetName = document.getElementById('testnetName');
+    
+    if (network === 'holesky') {
+        icon.textContent = '🟡';
+        label.textContent = 'Holesky';
+        badge.classList.add('testnet');
+        testnetBanner.style.display = 'flex';
+        testnetName.textContent = 'Holesky';
+        badge.title = 'Testnet Mode - Click to change network in Settings';
+    } else {
+        icon.textContent = '🟢';
+        label.textContent = 'Mainnet';
+        badge.classList.remove('testnet');
+        testnetBanner.style.display = 'none';
+        badge.title = 'Mainnet Mode - Click to change network in Settings';
+    }
+}
+
+async function switchNetwork(newNetwork) {
+    if (newNetwork === currentNetwork) {
+        return; // No change needed
+    }
+    
+    // Confirm if validators exist
+    if (validators.length > 0) {
+        const networkName = newNetwork === 'holesky' ? 'Holesky Testnet' : 'Mainnet';
+        const confirmed = confirm(`Switch to ${networkName}?\n\nYour current validators will be saved and you'll see validators for the selected network.`);
+        if (!confirmed) {
+            // Reset dropdown to current network
+            document.getElementById('networkSelector').value = currentNetwork;
+            return;
+        }
+    }
+    
+    // Save current network to main process
+    await window.electronAPI.setNetwork(newNetwork);
+    currentNetwork = newNetwork;
+    
+    // Update UI
+    updateNetworkBadge(newNetwork);
+    
+    // Reload validators for new network
+    const result = await window.electronAPI.getValidators();
+    if (result.success) {
+        validators = result.validators || [];
+        renderValidatorList();
+        updateDashboard();
+        renderPerformanceOverview();
+        
+        // Clear validator details
+        document.getElementById('validatorDetails').innerHTML = `
+            <h3>Validator Details</h3>
+            <p class="text-muted">Select a validator to view details</p>
+        `;
+    }
+    
+    console.log(`Switched to ${newNetwork} network`);
+}
+
 // Settings Page Functions
 async function showSettingsPage() {
     // Load API key from main process
@@ -1089,6 +1164,9 @@ async function showSettingsPage() {
     if (apiKey) {
         appSettings.apiKey = apiKey;
     }
+    
+    // Load current network
+    currentNetwork = await window.electronAPI.getNetwork();
     
     // Load current settings into UI
     document.getElementById('notifyHealthDrop').checked = appSettings.notifications.healthDrop;
@@ -1102,6 +1180,7 @@ async function showSettingsPage() {
     document.getElementById('showDetailedStats').checked = appSettings.display.detailedStats;
     document.getElementById('compactMode').checked = appSettings.display.compactMode;
     document.getElementById('beaconchaApiKey').value = appSettings.apiKey;
+    document.getElementById('networkSelector').value = currentNetwork;
     
     // Show settings page
     document.getElementById('settingsPage').style.display = 'block';
@@ -1127,6 +1206,12 @@ async function saveSettings() {
     
     // Save API key to main process
     await window.electronAPI.setApiKey(appSettings.apiKey);
+    
+    // Handle network change
+    const selectedNetwork = document.getElementById('networkSelector').value;
+    if (selectedNetwork !== currentNetwork) {
+        await switchNetwork(selectedNetwork);
+    }
     
     // Update refresh interval
     REFRESH_INTERVAL = appSettings.refreshInterval;
